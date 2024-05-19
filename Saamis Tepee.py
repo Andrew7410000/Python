@@ -1,25 +1,25 @@
 import arcpy
 
 # Set the workspace and enable overwrite output
-arcpy.env.workspace = r"D:\ARC PRO\Qibla\Qibla.gdb"
+arcpy.env.workspace = r"C:\Study\GIS\Portfolio\Saamis Tepee\Saamis Tepee.gdb"
 arcpy.env.overwriteOutput = True
 
 # Get the input feature class from user input
 inputFeature = arcpy.GetParameterAsText(0)
 
 # Merge input feature classes into a single feature class named "Merge"
-input_feature_classes = [inputFeature, "Mecca"]
+input_feature_classes = [inputFeature, "Tepee"]
 arcpy.Merge_management(input_feature_classes, "Merge")
 
 # Create a line feature class from the merged features named "Line"
 arcpy.management.PointsToLine("Merge", "Line")
 
-# Calculate the directional mean of the line feature class and store the result in a table named "Lineqibla"
+# Calculate the directional mean of the line feature class and store the result in a table named "Linetower"
 input_feature_class = "Line"
-output_table = "Lineqibla"
+output_table = "LineSaamis"
 arcpy.stats.DirectionalMean(input_feature_class, output_table, "DIRECTION")
 
-# Add fields "Direction" and "Position" to the "Lineqibla" table
+# Add fields "Direction" and "Position" to the "Linetower" table
 arcpy.management.AddField(output_table, "Direction", "TEXT")
 arcpy.management.AddField(output_table, "Position", "TEXT")
 
@@ -53,7 +53,7 @@ arcpy.management.CalculateField(output_table, "Position", expression1, "PYTHON3"
 # Print a message indicating successful completion of field calculations
 print("Field calculation for 'Direction' and 'Position' completed successfully.")
 
-# Retrieve values of "Direction" and "Position" fields from the "Lineqibla" table using search cursors
+# Retrieve values of "Direction" and "Position" fields from the "Linetower" table using search cursors
 direction_values = [row[0] for row in arcpy.da.SearchCursor(output_table, "Direction")]
 position_values = [row[0] for row in arcpy.da.SearchCursor(output_table, "Position")]
 
@@ -64,6 +64,6 @@ arcpy.AddMessage("The Direction is {0} Angle {1}".format(direction_values, posit
 aprx = arcpy.mp.ArcGISProject("CURRENT")
 map = aprx.listMaps()[0]
 
-# Add the "Lineqibla" layer to the map
-layer_file = r"D:\ARC PRO\Qibla\Qibla.gdb\Lineqibla"
+# Add the "Linetower" layer to the map
+layer_file = r"C:\Study\GIS\Portfolio\Saamis Tepee\Saamis Tepee.gdb\LineSaamis"
 map.addDataFromPath(layer_file)
